@@ -1,0 +1,58 @@
+﻿@model LabProject.Models.Orders
+
+@{
+    ViewData["Title"] = "訂單" + Model.OrderID;
+    Layout = "_Layout";
+}
+
+<h3 class="alert alert-danger text-center text-danger"><strong>確定要刪除訂單 @Html.DisplayFor(model => model.OrderID) 所有資料嗎?</strong></h3>
+@if (ViewData["ErrorMessage"] != null)
+{
+    <div class="alert alert-warning text-danger">
+        @ViewData["ErrorMessage"]
+    </div>
+}
+<div class="card shadow">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.OrderDate)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.OrderDate)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.DeliveryDate)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.DeliveryDate)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Status)
+            </dt>
+            <dd class="col-sm-10">
+                <span class="@(Model.Status? "text-success":"text-danger")"><strong>@(Model.Status ? "已完成" : "待出貨") </strong></span>
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Notes)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Notes)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Employee)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Employee.Name)
+            </dd>
+        </dl>
+    </div>
+    <div class="card-footer">
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="OrderID" />
+            <input type="submit" value="確定刪除" class="btn btn-danger" onclick="return confirm('請注意!!您將會刪除該訂單所有資料，且無法回復。確定要刪除嗎?')" />
+        </form>
+    </div>
+</div>
+@await Component.InvokeAsync("VCOrderDetail", new { Oid = Model.OrderID })
+<div class="text-end"><a asp-action="Index">返回訂單管理首頁</a></div>

@@ -1,0 +1,71 @@
+﻿@model IEnumerable<LabProject.Models.Chemicals>
+
+@{
+    ViewData["Title"] = "化學品";
+    Layout = "_Layout";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<table class="table table-striped table-hover border border-1 border-dark">
+    <thead class="table-primary text-center border border-1 border-dark fw-bold">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ChineseName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Stock)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SafetyLevel)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Unit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StorageCondition)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CabinetName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Supplier.CompanyName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Categories.CategoryID)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody class="text-center">
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ChineseName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Stock)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SafetyLevel)
+                <td>@(item.Unit ? "公斤" : "公升")</td>
+
+                <td> @(item.StorageCondition ? "室溫" : "冷藏")</td>
+                
+                <td>
+                    @Html.DisplayFor(modelItem => item.CabinetName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Supplier.CompanyName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Categories.CategoryName)
+                </td>
+                <td>
+                    <a asp-action="Delete" asp-route-id="@item.ChemicalID" class="btn btn-danger">刪除</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

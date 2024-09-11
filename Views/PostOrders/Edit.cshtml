@@ -1,0 +1,40 @@
+﻿@model LabProject.Models.Orders
+
+@{
+    ViewData["Title"] = "Edit";
+     Layout = null;
+}
+
+<div class="row">
+    <div class="col-md">
+        <form asp-action="Edit" id="reEditForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="OrderID" />
+            <div class="form-group d-none">
+                <label asp-for="EmployeeID" class="control-label"></label>
+                <select asp-for="EmployeeID" class="form-control" asp-items="ViewBag.EmployeeID"></select>
+                <span asp-validation-for="EmployeeID" class="text-danger"></span>
+            </div> 
+            <div class="form-group">
+                <input type="hidden" asp-for="OrderDate" class="form-control" />
+            </div>
+            <div class="form-group">
+                <input type="hidden" asp-for="DeliveryDate" class="form-control" />
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Status" /> 已完成
+                </label>
+            </div>
+            <div class="form-group d-none">
+                <label asp-for="Notes" class="control-label"></label>
+                <textarea asp-for="Notes" class="form-control"></textarea>
+                <span asp-validation-for="Notes" class="text-danger"></span>
+            </div> 
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

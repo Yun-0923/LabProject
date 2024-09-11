@@ -1,0 +1,81 @@
+﻿@model IEnumerable<LabProject.Models.Orders>
+
+@{
+    ViewData["Title"] = "訂單";
+    Layout = "_Layout";
+
+    var orders = ViewBag.Orders as List<Orders>;
+    int currentPage = ViewBag.CurrentPage;
+    int totalPages = ViewBag.TotalPages;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<table class="table table-striped table-hover border border-1 border-dark">
+    <thead class="table-primary text-center border border-1 border-dark fw-bold ">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DeliveryDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Employee)
+            </th>
+            <th>
+
+            </th>
+        </tr>
+    </thead>
+    <tbody class="text-center">
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrderID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrderDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DeliveryDate)
+                </td>
+                <td>
+                    <span class="@(item.Status? "text-success":"text-danger")">
+                        <i class="@(item.Status? "bi bi-check-circle-fill":"bi bi-x-circle-fill")"></i> @(item.Status ? "已完成" : "待出貨")
+                    </span>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Employee.Name)
+                </td>
+                <td>
+                    <a asp-action="Delete" asp-route-id="@item.OrderID" class="btn btn-danger">刪除</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="text-center">
+    <ul class="pagination justify-content-center">
+        <li class="page-item">
+            <a class="page-link text-dark" asp-action="Index" asp-route-pageNumber="@(currentPage > 1? currentPage - 1:currentPage)">上一頁</a>
+        </li>
+
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            <li class="page-item @(i == currentPage ? "active" : "")">
+                <a class="page-link text-dark" asp-action="Index" asp-route-pageNumber="@i">@i</a>
+            </li>
+        }
+        <li class="page-item">
+            <a class="page-link text-dark" asp-action="Index" asp-route-pageNumber="@(currentPage < totalPages? currentPage + 1:currentPage)">下一頁</a>
+        </li>
+    </ul>
+</div>

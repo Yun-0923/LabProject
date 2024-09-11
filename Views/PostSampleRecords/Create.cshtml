@@ -1,0 +1,62 @@
+﻿@model LabProject.Models.SampleRecords
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Create</title>
+</head>
+<body>
+
+
+<div class="row">
+    <div class="col">
+        <form asp-action="Create" id="reForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="text-danger text-center fs-5" id="errorMes"></div>
+            <div class="form-group">
+                <label asp-for="EmployeeID" class="control-label mb-1">操作者</label>
+                <select asp-for="EmployeeID" class ="form-control" asp-items="ViewBag.EmployeeID"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="SampleID" class="control-label my-1"></label>
+                <select asp-for="SampleID" class ="form-control" asp-items="ViewBag.SampleID"></select>
+            </div>
+                <div class="form-group">
+                    <div class="control-label mb-1"> 交易類型 </div>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" asp-for="TransactionType" id="store" value="true" class="form-check-input" />
+                        <label class="form-check-label" for="store">存入</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" asp-for="TransactionType" id="remove" value="false" class="form-check-input" />
+                        <label class="form-check-label" for="remove">移出</label>
+                    </div>
+                    <span asp-validation-for="TransactionType" class="text-danger"></span>
+                </div>
+            <div class="form-group">
+                <label asp-for="Quantity" class="control-label my-1"></label>
+                <input asp-for="Quantity" class="form-control" />
+                <span asp-validation-for="Quantity" class="text-danger"></span>
+                    <div class="text-danger" id="errorMes"></div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Notes" class="control-label mt-1"></label>
+                <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Notes" class="text-danger"></span>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+</body>
+</html>

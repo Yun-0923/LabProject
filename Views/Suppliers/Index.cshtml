@@ -1,0 +1,53 @@
+﻿@model IEnumerable<LabProject.Models.Supplier>
+
+@{
+    ViewData["Title"] = "供應商";
+    Layout = "_Layout";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<table class="table table-striped table-hover border border-1 border-dark">
+    <thead class="table-primary text-center border border-1 border-dark fw-bold">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.CompanyName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ContactName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ContactTel)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Address)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody class="text-center">
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CompanyName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ContactName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ContactTel)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Address)
+                </td>
+                <td>
+                    <form asp-action="Delete" asp-route-id="@item.SupplierID">
+                        <input type="hidden" value="@item.SupplierID" />
+                        <input type="submit" value="刪除" class="btn btn-danger" onclick="return confirm('請注意!!刪除後無法回復。確定要刪除【@(item.CompanyName)】的資料嗎?')" />
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,64 @@
+﻿@model IEnumerable<LabProject.Models.ChemicalRecords>
+@using Newtonsoft.Json
+@{
+    Layout = null;
+    var Manager = Context.Session.GetString("Manager");
+    var userRoleSession = Context.Session.GetString("UserRole");
+    var userRole = JsonConvert.DeserializeObject<int>(userRoleSession); 
+}
+
+@if (Model.Count() == 0)
+{
+    <div class="text-center text-danger fs-1">目前尚無使用紀錄</div>
+}
+else
+{
+    <div class="card mt-3">
+        <div class="card-body">
+            <h4 class="mt-2 ps-3 text-success fw-bold fs-4">使用紀錄</h4>
+            <hr />
+            <dl class="row text-center fw-bold">
+                <dd class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Employee)
+                </dd>
+                <dd class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Quantity)
+                </dd>
+                <dd class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Date)
+                </dd>
+                <dd class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Notes)
+                </dd>
+            </dl>
+            @foreach (var item in Model)
+            {
+                <dl class="row align-items-center text-center">
+                    <dd class="col-sm-2">
+                        @item.Employee.Name
+                    </dd>
+                    <dd class="col-sm-2">
+                        @item.Quantity
+                        <span>@(item.Chemical.Unit ? "公斤" : "公升")</span>
+                    </dd>
+                    <dd class="col-sm-2">
+                        @item.Date.ToString("yyyy/MM/dd")
+                    </dd>
+                    <dd class="col-sm-2">
+                        @Html.Raw(item.Notes != null ? item.Notes.Replace("\r\n", "<br>") : string.Empty)
+                    </dd>
+                    <dd class="col">
+                        @if (Manager != null && userRole == 0)
+                        {
+                            <form asp-action="DeleteChemicalRecord" class="text-end">
+                                <input type="hidden" value="@item.RecordID" name="id" />
+                                <input type="submit" value="刪除" class="btn btn-danger" onclick="return confirm('您確定要刪除此筆使用紀錄嗎?')" />
+                            </form>
+                        }
+                    </dd>
+                </dl>
+            }
+            <hr />
+        </div>
+    </div>
+}

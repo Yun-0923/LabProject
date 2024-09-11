@@ -1,0 +1,188 @@
+﻿@model IEnumerable<LabProject.Models.Orders>
+@using Newtonsoft.Json
+@{
+    var orders = ViewBag.Orders as List<Orders>;
+    int currentPage = ViewBag.CurrentPage;
+    int totalPages = ViewBag.TotalPages;
+
+    var Manager = Context.Session.GetString("Manager");
+    var currentPath = Context.Request.Path;
+    var userRoleSession = Context.Session.GetString("UserRole");
+    var userRole = userRoleSession != null ? JsonConvert.DeserializeObject<int>(userRoleSession) : (int?)null;
+
+    // 如果未登入且當前頁面不是 Home/Index，則導回首頁
+    if (Manager == null && currentPath != "/Home/Index")
+    {
+        Context.Response.Redirect("/Home/Index");
+        return;
+    }
+    else if (userRole != 2 && userRole != 1)
+    {
+        Context.Response.Redirect("/PostSamples/Index");
+        return;
+    }
+    ViewData["Title"] = "訂單";
+}
+
+
+<div class="bg-img-main">
+    <div class="container">
+        <div class="text-end py-3">
+            @if (userRole == 2)
+            {
+                <button class="btn btn-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#ReOrderFormOffcanvas" aria-controls="staticBackdrop">
+                    新增@(ViewData["Title"])資料
+                </button>
+            }
+        </div>
+        <div class="offcanvas offcanvas-start" data-bs-backdrop="static" tabindex="-1" id="ReOrderFormOffcanvas" aria-labelledby="staticBackdropLabel">
+            <div class="offcanvas-header">
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div id="ReOrderForm">
+                </div>
+            </div>
+        </div>
+
+        <table class="table table-striped table-hover border border-1 border-dark">
+            <thead class="table-bordered table-darkblue text-center fw-bold">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.OrderID)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.OrderDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.DeliveryDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Status)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Notes)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Employee)
+                    </th>
+                    <th>變更訂單狀態</th>
+                    <th>查看訂單明細</th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.OrderID)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.OrderDate)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DeliveryDate)
+                        </td>
+                        <td>
+                            <span class="@(item.Status? "text-success":"text-danger")">
+                                <i class="@(item.Status? "bi bi-check-circle-fill":"bi bi-x-circle-fill")"></i> @(item.Status ? "已完成" : "待出貨")
+                            </span>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Notes)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Employee.Name)
+                        </td>
+                        <td>
+                            @if (userRole == 2 && item.Status == false)
+                            {
+                                <button class="btn btn-outline-warning fw-bold" data-bs-toggle="modal" data-bs-target="#editReForm" data-order-id="@item.OrderID"><i class="bi bi-pencil-fill"></i></button>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.OrderID" class="btn btn-secondary">
+                                <i class="bi bi-book"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="text-center">
+            <ul class="pagination justify-content-center">
+                <li class="page-item">
+                    <a class="page-link text-dark" asp-action="Index" asp-route-pageNumber="@(currentPage > 1? currentPage - 1:currentPage)"><i class="bi bi-caret-left-fill"></i></a>
+                </li>
+
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link text-dark" asp-action="Index" asp-route-pageNumber="@i">@i</a>
+                    </li>
+                }
+                <li class="page-item">
+                    <a class="page-link text-dark" asp-action="Index" asp-route-pageNumber="@(currentPage < totalPages? currentPage + 1:currentPage)"><i class="bi bi-caret-right-fill"></i></a>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="editReForm" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="text-danger fs-5">請注意!! 訂單狀態變更後將無法回復!!</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="OrderEditReForm">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" onclick="ReEditForm()">確定變更</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        const editReForm = new bootstrap.Modal(document.getElementById('editReForm'))
+
+        $('#editReForm').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // 觸發 modal 的按鈕
+            var orderId = button.data('order-id'); // 從按鈕的 data-order-id 中獲取值
+            // console.log();
+            $('#OrderEditReForm').load(`/PostOrders/Edit?id=${orderId}`, function () {
+                $.validator.unobtrusive.parse($('#OrderEditReForm'));
+            });
+        });
+
+        function ReEditForm() {
+            var orderId = $('#reEditForm input[name="OrderID"]').val(); // 獲取 OrderID
+
+            $.ajax({
+                type: "Post",
+                url: `/PostOrders/Edit/${orderId}`,
+                data: $('#reEditForm').serialize(),
+                success: (data) => {
+                    editReForm.hide(); //把modal關閉
+                    window.location.reload();  // 重新整理頁面
+                }
+            });
+        }
+
+        $('#ReOrderForm').load(`/PostOrders/Create`, function () {
+            // 手動啟用表單驗證
+            $.validator.unobtrusive.parse($('#ReOrderForm'));
+        });
+
+
+    </script>
+}

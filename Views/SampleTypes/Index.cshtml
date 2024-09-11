@@ -1,0 +1,36 @@
+﻿@model IEnumerable<LabProject.Models.SampleType>
+
+@{
+    ViewData["Title"] = "樣本類別管理";
+    Layout = "_Layout";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-4">
+<table class="table table-striped table-hover border border-1 border-dark">
+    <thead class="table-primary text-center border border-1 border-dark fw-bold">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.TypeName)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody class="text-center">
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.TypeName)
+            </td>
+            <td>
+                    <form asp-action="Delete" asp-route-id="@item.TypeID">
+                        <input type="hidden" value="@item.TypeID" />
+                                <input type="submit" value="刪除" class="btn btn-danger" onclick="return confirm('請注意!!刪除後無法回復。確定要刪除【@(item.TypeName)】嗎?')" />
+                    </form>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+    </div>
+</div>

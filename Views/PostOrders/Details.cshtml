@@ -1,0 +1,168 @@
+﻿@model LabProject.Models.Orders
+@using Newtonsoft.Json
+@{
+    var Manager = Context.Session.GetString("Manager");
+    var currentPath = Context.Request.Path;
+    var userRoleSession = Context.Session.GetString("UserRole");
+    var userRole = userRoleSession != null ? JsonConvert.DeserializeObject<int>(userRoleSession) : (int?)null;
+    if (Manager == null && currentPath != "/Home/Index")
+    {
+        Context.Response.Redirect("/Home/Index");
+        return;
+    }
+    ViewData["Title"] = "訂單" + Model.OrderID;
+}
+
+<div class="bg-blue-light">
+    <div class="container">
+        <div class="row">
+            <div class="card col-md-3 mt-3">
+                <div class="card-header text-center bg-blue mt-2 fw-bold text-success fs-5 border">
+                    <div>訂單 @Model.OrderID</div>
+                </div>
+                <div class="card-body border mb-3">
+                    <dl class="row">
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.OrderDate)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.OrderDate)
+                        </dd>
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.DeliveryDate)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.DeliveryDate)
+                        </dd>
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.Status)
+                        </dt>
+                        <dd class="col-sm-8">
+                            <span class="@(Model.Status ? "text-success" : "text-danger")">
+                                @(Model.Status ? "已完成" : "待出貨")
+                            </span>
+                        </dd>
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.Notes)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.Notes)
+                        </dd>
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.Employee)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.Employee.Name)
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+            <div class="col-md-9" id="OrderDetailsList">
+                @await Component.InvokeAsync("VCOrderDetail", new { Oid = Model.OrderID })
+            </div>
+        </div>
+        @if (userRole != 1)
+        {
+            @if (Model.OrderDate != null && Model.OrderDate.Date == DateTime.Today && Model.Status == false)
+            {
+                <div>
+                    <button class="btn btn-success mt-3" data-bs-toggle="modal" data-bs-target="#CreateOrderDetails" onclick="getChemicalFrom()"> 新增化學品明細 </button>
+                </div>
+                <div>
+                    <button class="btn btn-success mt-3" data-bs-toggle="modal" data-bs-target="#CreateOrderDetails" onclick="getConsumableFrom()"> 新增耗材明細 </button>
+                </div>
+            }
+        }
+
+        <!-- Modal -->
+        <div class="modal fade" id="CreateOrderDetails" data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header bg-darkblue2 text-white">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">訂單 @Model.OrderID</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body bg-light" id="OrderDetailsReForm">
+                    </div>
+                    <div class="modal-footer bg-darkblue2">
+                        <button type="button" class="btn btn-light text-danger fw-bold">繼續新增</button>
+                        <button type="button" class="btn btn-light text-success fw-bold">確定並關閉</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-end fs-5 fw-bold">
+            <a asp-action="Index">回訂單主畫面</a>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        const CreateOrderDetails = new bootstrap.Modal(document.getElementById('CreateOrderDetails'));
+
+        function getChemicalFrom() {
+            $('#OrderDetailsReForm').load(`/PostOrders/CreateChemicalDetails?orderId=@(Model.OrderID)`, function () {
+                $.validator.unobtrusive.parse($('#OrderDetailsReForm'));
+            })
+
+            $('.modal-footer .text-danger').attr('onclick', 'reCreateChemical()');
+            $('.modal-footer .text-success').attr('onclick', 'submitCreateChemical()');
+        };
+
+        function getConsumableFrom() {
+            $('#OrderDetailsReForm').load(`/PostOrders/CreateConsumableDetails?orderId=@(Model.OrderID)`, function () {
+                $.validator.unobtrusive.parse($('#OrderDetailsReForm'));
+            })
+
+            $('.modal-footer .text-danger').attr('onclick', 'reCreateConsumable()');
+            $('.modal-footer .text-success').attr('onclick', 'submitCreateConsumable()');
+        };
+
+        function reCreateChemical() {
+            if ($('#reChemicalOrderDetailForm').valid()) {
+                $.ajax({
+                    type: "Post",
+                    url: `/PostOrders/CreateChemicalDetails`,
+                    data: $('#reChemicalOrderDetailForm').serialize(),
+                    success: (data) => {
+                        $('#Quantity').val('');
+                        $('#OrderDetailsList').load(`/PostOrders/GetVCOrderDetail/@(Model.OrderID)`);
+                    }
+                });
+            }
+        }
+
+        function submitCreateChemical() {
+            reCreateChemical();
+            if ($('#reChemicalOrderDetailForm').valid())
+            {
+                CreateOrderDetails.hide();
+            }
+        }
+
+        function reCreateConsumable() {
+            if ($('#reConsumableOrderDetailForm').valid()) {
+                $.ajax({
+                    type: "Post",
+                    url: `/PostOrders/CreateConsumableDetails`,
+                    data: $('#reConsumableOrderDetailForm').serialize(),
+                    success: (data) => {
+                        $('#Quantity').val('');
+                        $('#OrderDetailsList').load(`/PostOrders/GetVCOrderDetail/@(Model.OrderID)`);
+                    }
+                });
+            }
+        }
+
+        function submitCreateConsumable() {
+            reCreateConsumable();
+            if ($('#reConsumableOrderDetailForm').valid()) {
+                CreateOrderDetails.hide();
+            }
+        }
+
+    </script>
+}

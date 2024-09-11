@@ -1,0 +1,61 @@
+﻿@model IEnumerable<LabProject.Models.Consumables>
+
+@{
+    ViewData["Title"] = "耗材";
+    Layout = "_Layout";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<table class="table table-striped table-hover border border-1 border-dark">
+    <thead class="table-primary text-center border border-1 border-dark fw-bold">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ConsumableName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.QuantityPerUnit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UnitInStock)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SafetyLevel)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExpireDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Room)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody class="text-center">
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ConsumableName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.QuantityPerUnit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UnitInStock)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SafetyLevel)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ExpireDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Room)
+            </td>
+            <td>
+                <a asp-action="Delete" asp-route-id="@item.ConsumableID" class="btn btn-danger">刪除</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

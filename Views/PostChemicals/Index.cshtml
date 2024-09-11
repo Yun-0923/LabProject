@@ -1,0 +1,158 @@
+﻿@* @model IEnumerable<LabProject.Models.Chemicals> *@
+@model LabProject.ViewModels.VMPostChemicals
+@using Newtonsoft.Json
+@{
+    // 檢查使用者的登入狀態
+    var Manager = Context.Session.GetString("Manager");
+    var currentPath = Context.Request.Path;
+    var userRoleSession = Context.Session.GetString("UserRole");
+    var userRole = userRoleSession != null ? JsonConvert.DeserializeObject<int>(userRoleSession) : (int?)null;
+
+    // 如果未登入且當前頁面不是 Home/Index，則導回首頁
+    if (Manager == null && currentPath != "/Home/Index")
+    {
+        Context.Response.Redirect("/Home/Index");
+        return; // 確保不再執行後續代碼
+    }
+
+    ViewData["Title"] = "化學品";
+    var CatID = ViewData["CatID"];
+}
+<div class="bg-img-main">
+    <div class="container">
+        <div class="text-end py-3">
+            @if (userRole != 1)
+            {
+                <button class="btn btn-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#ReChemicalFormOffcanvas" aria-controls="staticBackdrop">
+                    新增@(ViewData["Title"])資料
+                </button>
+            }
+        </div>
+        <div class="offcanvas offcanvas-start" data-bs-backdrop="static" tabindex="-1" id="ReChemicalFormOffcanvas" aria-labelledby="staticBackdropLabel">
+            <div class="offcanvas-header">
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div id="ReChemicalForm">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2 list-group">
+                @foreach (var item in Model.Category)
+                {
+                    <a asp-action="Index" asp-route-catid="@item.CategoryID" class="list-group-item list-group-item-light list-group-item-action text-center fs-5 fw-bold mt-1 rounded border border-1 border-dark">@item.CategoryName</a>
+                }
+                @if (userRole != 1)
+                {
+                    <div id="createCategory" class="mt-1"></div>
+                }
+            </div>
+
+            <div class="col-md-10">
+                <h1 class="text-center alert alert-primary">
+                    @switch (ViewBag.CatID)
+                    {
+                        case 1:
+                            <span class="text-danger"><i class="bi bi-emoji-dizzy me-3"></i>@ViewData["CatName"]</span>
+                            break;
+                        case 2:
+                            <span class="text-warning"><i class="bi bi-emoji-neutral me-3"></i>@ViewData["CatName"]</span>
+                            break;
+                        default:
+                            <span class="text-primary"><i class="bi bi-emoji-smile me-3"></i>@ViewData["CatName"]</span>
+                            break;
+
+                    }
+                </h1>
+                @if (Model.Chemical.Count() == 0)
+                {
+                    <h2 class="text-danger">目前尚無任何 @ViewData["Title"] 資料</h2>
+                }
+                else
+                {
+                    <table class="table table-striped table-hover border border-1 border-dark">
+                        <thead class="table-bordered table-darkblue text-center fw-bold">
+                            <tr>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Chemical.FirstOrDefault().ChineseName)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Chemical.FirstOrDefault().EnglishName)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Chemical.FirstOrDefault().Stock)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Chemical.FirstOrDefault().Unit)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Chemical.FirstOrDefault().StorageCondition)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Chemical.FirstOrDefault().CabinetName)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Chemical.FirstOrDefault().CabinetNumber)
+                                </th>
+                                <th>詳細資料</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-center">
+                            @foreach (var item in Model.Chemical)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ChineseName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.EnglishName)
+                                    </td>
+                                    <td>
+                                        @if (item.Stock < item.SafetyLevel)
+                                        {
+                                            <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+                                        }
+                                        @Html.DisplayFor(modelItem => item.Stock)
+                                    </td>
+                                    <td>@(item.Unit ? "公斤" : "公升")</td>
+                                    <td> @(item.StorageCondition ? "室溫" : "冷藏")</td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.CabinetName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.CabinetNumber)
+                                    </td>
+                                    <td>
+
+                                        <a asp-action="Details" asp-route-id="@item.ChemicalID" class="btn btn-secondary"><i class="bi bi-book"></i></a>
+
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        var currentId = '@ViewData["CatID"]';
+        $('#ReChemicalForm').load(`/PostChemicals/Create?catid=${currentId}`, function () {
+            // 手動啟用表單驗證
+            $.validator.unobtrusive.parse($('#ReChemicalForm'));
+        });
+
+        $('#createCategory').load(`/PostChemicals/CategoryCreate`, function () {
+            $.validator.unobtrusive.parse($('#createCategory'));
+        });
+
+
+    </script>
+}

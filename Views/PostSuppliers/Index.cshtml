@@ -1,0 +1,92 @@
+﻿@model IEnumerable<LabProject.Models.Supplier>
+@using Newtonsoft.Json
+@{
+    // 檢查使用者的登入狀態
+    var Manager = Context.Session.GetString("Manager");
+    var currentPath = Context.Request.Path;
+    var userRoleSession = Context.Session.GetString("UserRole");
+    var userRole = userRoleSession != null ? JsonConvert.DeserializeObject<int>(userRoleSession) : (int?)null;
+
+    // 如果未登入且當前頁面不是 Home/Index，則導回首頁
+    if (Manager == null && currentPath != "/Home/Index")
+    {
+        Context.Response.Redirect("/Home/Index");
+        return; // 確保不再執行後續代碼
+    }
+    else if (userRole != 2 && userRole != 1)
+    {
+        Context.Response.Redirect("/PostSamples/Index");
+        return;
+    }
+
+    ViewData["Title"] = "供應商";
+}
+<div class="bg-img-main">
+    <div class="container">
+        <div class="text-end py-3">
+            @if (userRole == 2)
+            {
+                <button class="btn btn-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#ReFormOffcanvas" aria-controls="staticBackdrop">
+                    新增@(ViewData["Title"])資料
+                </button>
+            }
+        </div>
+        <div class="offcanvas offcanvas-start" data-bs-backdrop="static" tabindex="-1" id="ReFormOffcanvas" aria-labelledby="staticBackdropLabel">
+            <div class="offcanvas-header">
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div id="ReCreateForm">
+                </div>
+            </div>
+        </div>
+
+        <table class="table table-striped table-hover border border-1 border-dark">
+            <thead class="table-darkblue text-center fw-bold">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CompanyName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ContactName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ContactTel)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Address)
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="text-center" id="supplierList">
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CompanyName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ContactName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ContactTel)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Address)
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        $('#ReCreateForm').load(`/PostSuppliers/Create`, function () {
+            // 手動啟用表單驗證
+            $.validator.unobtrusive.parse($('#ReCreateForm'));
+        });
+    </script>
+}

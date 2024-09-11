@@ -1,0 +1,75 @@
+﻿@model LabProject.Models.Employee
+
+@{
+    ViewData["Title"] = "會員註冊";
+}
+<div class="bg-img-main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4"></div>
+            <div class="card col-md-4 mt-3">
+                <div class="card-header bg-success text-white text-center fs-5 fw-bold mt-1 border">
+                    @ViewData["Title"]
+                </div>
+                <div class="card-body text-primary fw-bold ">
+                    <div class="text-danger fw-bold fs-5 mb-2 text-center">@ViewData["Message"]</div>
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="form-group">
+                            <label asp-for="EmployeeID" class="control-label"></label>
+                            <input asp-for="EmployeeID" class="form-control" />
+                            <span asp-validation-for="EmployeeID" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Name" class="control-label"></label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="password" class="control-label"></label>
+                            <input asp-for="password" class="form-control" />
+                            <span asp-validation-for="password" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Role" class="control-label"></label>
+                            @Html.DropDownListFor(model => model.Role, new SelectList(
+                                     new List<SelectListItem>
+                            {
+                            new SelectListItem { Value = "3", Text = "研究人員" },
+                            new SelectListItem { Value = "2", Text = "助理" },
+                            new SelectListItem { Value = "1", Text = "主持人" }
+                            }, "Value", "Text"), new { @class = "form-control" })
+                            <span asp-validation-for="Role" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Email" class="control-label"></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" asp-for="CreatedDate" class="form-control" value="@DateTime.Now" />
+                            <span asp-validation-for="CreatedDate" class="text-danger"></span>
+                        </div>
+                        <div class="form-group form-check">
+                            <input type="hidden" class="form-check-input" asp-for="IsActive" value="true" />
+
+                        </div>
+                        <div class="form-group text-end">
+                            <input type="submit" value="確定" class="btn btn-warning" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="row fs-5 mt-2">
+            <div class="col-md-4"></div>
+            <a asp-action="Index" class="col-md-4">回登入首頁</a>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

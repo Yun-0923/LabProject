@@ -1,0 +1,94 @@
+﻿@model LabProject.Models.Consumables
+
+@{
+    ViewData["Title"] = "新增耗材資料";
+    Layout = null;
+}
+
+<div class="container mt-3">
+
+    <div class="row">
+        <div class="col-md">
+            <form asp-action="Create" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="card">
+                    <div class="card-header bg-success text-white text-center fs-5 fw-bold">
+                        @ViewData["Title"]
+                    </div>
+                    <div class="card-body text-primary fw-bold">
+                        <div class="form-group">
+                            <label asp-for="ConsumableName" class="control-label"></label>
+                            <input asp-for="ConsumableName" class="form-control" />
+                            <span asp-validation-for="ConsumableName" class="text-danger"></span>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-7">
+                                <label asp-for="QuantityPerUnit" class="control-label"></label>
+                                <input asp-for="QuantityPerUnit" class="form-control" />
+                                <span asp-validation-for="QuantityPerUnit" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-5">
+                                <label asp-for="SupplierID" class="control-label"></label>
+                                <select asp-for="SupplierID" class="form-control" asp-items="ViewBag.SupplierID"></select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-3">
+                                <label asp-for="UnitInStock" class="control-label"></label>
+                                <input asp-for="UnitInStock" class="form-control" />
+                                <span asp-validation-for="UnitInStock" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label asp-for="SafetyLevel" class="control-label"></label>
+                                <input asp-for="SafetyLevel" class="form-control" />
+                                <span asp-validation-for="SafetyLevel" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-6">
+                            <label asp-for="ExpireDate" class="control-label"></label>
+                                <input asp-for="ExpireDate" class="form-control" type="date" />
+                            <span asp-validation-for="ExpireDate" class="text-danger"></span>
+                        </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label asp-for="Room" class="control-label"></label>
+                                <input asp-for="Room" class="form-control" />
+                                <span asp-validation-for="Room" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label asp-for="Cabinet" class="control-label"></label>
+                                <input asp-for="Cabinet" class="form-control" />
+                                <span asp-validation-for="Cabinet" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label asp-for="Shelf" class="control-label"></label>
+                                <input asp-for="Shelf" class="form-control" />
+                                <span asp-validation-for="Shelf" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Description" class="control-label"></label>
+                            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Photo" class="control-label"></label>
+                            <input type="file" id="uploadPhoto" name="uploadPhoto" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 my-3" id="photoPreview"></div>
+                <div class="form-group">
+                    <input type="submit" value="確定新增" class="btn btn-warning" />
+                </div>
+            </form>
+        </div> 
+    </div>
+
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,122 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.bgpicture {
+    width: 100%;
+    background-image: url('../photo/05.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    min-height: 815px;
+}
+.bg-img {
+    background-image: url('../photo/14.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.bg-img-main {
+    background-image: url('../photo/23.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    min-height: 815px;
+}
+
+
+.bg-img-darkBlue {
+    background-image: url('../photo/12.jpg');
+    background-repeat: repeat;
+    background-size:cover;
+}
+
+.bg-img-lightBlue {
+    background-image: url('../photo/10.jpg');
+    background-repeat: repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+.bg-blue-light {
+    background-color: rgb(137 185 243 / 17%);
+    min-height: 815px;
+}
+
+.bg-blue-white {
+    background-color: #8fb3da91;
+}
+.bg-gray {
+    background-color: #9896a9e0;
+}
+.bg-blue {
+    background-color: #ade0f9;
+}
+.bg-darkblue {
+    background-color: #01388b;
+}
+.bg-darkblue2 {
+    background-color: #071996bf;
+}
+
+.w-5 {
+    width: 5%;
+}
+.h-5 {
+    height:5vh;
+}
+.range {
+    width:150px;
+    height:150px;
+    background-color:white;
+}
+.table-darkblue {
+    --bs-table-color: #f8f8fb;
+    --bs-table-bg: #002968;
+    --bs-table-border-color: #a6b5cc;
+    --bs-table-striped-bg: #cee2ff;
+    --bs-table-striped-color: #000;
+    --bs-table-active-bg: #bacbe6;
+    --bs-table-active-color: #000;
+    --bs-table-hover-bg: #a5c5f5;
+    --bs-table-hover-color: #8f8888;
+    color: var(--bs-table-color);
+    border-color: #7697c9;
+}
+.bg-green {
+    --bs-bg-opacity: 1;
+    background-color: #bbffd1;
+}
+
+.bg-green-white {
+    background-color: #c7f7c55b;
+}
+.card-img-wrapper {
+    height: 300px; /* 固定圖片的顯示高度 */
+    overflow: hidden; /* 隱藏超出高度的部分 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pagination .active .page-link {
+    background-color: #ade0f9d1; 
+}

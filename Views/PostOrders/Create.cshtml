@@ -1,0 +1,65 @@
+﻿@model LabProject.Models.Orders
+
+@{
+    ViewData["Title"] = "新增訂單資料";
+    Layout = null;
+}
+
+<div class="container mt-3">
+
+    <form asp-action="Create">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="row">
+            <div class="col-md">
+                <div class="card">
+                    <div class="card-header bg-success text-white text-center fs-5 fw-bold">
+                        @ViewData["Title"]
+                    </div>
+                    <div class="card-body text-primary fw-bold">
+                        <div class="form-group">
+                            <label asp-for="EmployeeID" class="control-label">經手員工</label>
+                            <select asp-for="EmployeeID" class="form-control" asp-items="ViewBag.EmployeeID"></select>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="OrderDate" class="control-label"></label>
+                            <input asp-for="OrderDate" class="form-control" type="date" value="@ViewData["OrderDate"]" readonly/>
+                            <span asp-validation-for="OrderDate" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" asp-for="DeliveryDate" class="form-control" />
+                            <span asp-validation-for="DeliveryDate" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <div class="control-label">
+                                @Html.DisplayNameFor(model => model.Status)
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" asp-for="Status" id="finished" value="true" class="form-check-input" />
+                                <label class="form-check-label text-dark" for="finished">已完成</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" asp-for="Status" id="waited" value="false" class="form-check-input" checked />
+                                <label class="form-check-label text-dark" for="waited">待出貨</label>
+                            </div>
+                            <span asp-validation-for="Status" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Notes" class="control-label"></label>
+                            <textarea asp-for="Notes" class="form-control"></textarea>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="確定並新增明細" class="btn btn-warning mt-3" />
+            </div>
+        </div>
+    </form>
+
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

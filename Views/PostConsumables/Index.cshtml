@@ -1,0 +1,102 @@
+﻿@model IEnumerable<LabProject.Models.Consumables>
+@using Newtonsoft.Json
+@{
+    // 檢查使用者的登入狀態
+    var Manager = Context.Session.GetString("Manager");
+    var currentPath = Context.Request.Path;
+    var userRoleSession = Context.Session.GetString("UserRole");
+    var userRole = userRoleSession != null ? JsonConvert.DeserializeObject<int>(userRoleSession) : (int?)null;
+
+    // 如果未登入且當前頁面不是 Home/Index，則導回首頁
+    if (Manager == null && currentPath != "/Home/Index")
+    {
+        Context.Response.Redirect("/Home/Index");
+        return; // 確保不再執行後續代碼
+    }
+
+    ViewData["Title"] = "耗材";
+}
+
+<div class="bg-img-main">
+    <div class="container pb-3">
+        <div class="text-end py-3">
+            @if (userRole != 1)
+            {
+            <button class="btn btn-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#ReFormOffcanvas" aria-controls="staticBackdrop">
+                新增@(ViewData["Title"])資料
+                </button>
+            }
+        </div>
+        <div class="offcanvas offcanvas-start" data-bs-backdrop="static" tabindex="-1" id="ReFormOffcanvas" aria-labelledby="staticBackdropLabel">
+            <div class="offcanvas-header">
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div id="ReCreateForm">
+                </div>
+            </div>
+        </div>
+
+        <div class="card-group">
+            <div class="row">
+                @foreach (var item in Model)
+                {
+                    <div class="col-md-3 g-2">
+                        <div class="card border border-secondary">
+                            <div class="card-img-wrapper">
+                                @if (item.Photo != null)
+                                {
+                                    <img src="@Url.Action("GetImage","Consumables", new { cid = item.ConsumableID })" class="card-img-top" alt="@item.ConsumableName">
+                                }
+                            </div>
+                            <div class="card-header bg-darkblue">
+                                <h5 class="card-title text-center text-light mt-1">@item.ConsumableName</h5>
+                            </div>
+                            <div>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        @Html.DisplayNameFor(model => model.UnitInStock)： @item.UnitInStock (@item.QuantityPerUnit) &nbsp;
+                                        @if (@item.UnitInStock < @item.SafetyLevel)
+                                        {
+                                            <span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i>庫存低於安全量</span>
+                                        }
+                                    </li>
+                                    <li class="list-group-item">
+                                        @Html.DisplayNameFor(model => model.SafetyLevel)： @item.SafetyLevel (@item.QuantityPerUnit)
+                                    </li>
+                                    <li class="list-group-item">
+                                        存放位置： @item.Room @item.Cabinet @item.Shelf
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card-footer">
+                                <a asp-action="Details" asp-route-id="@item.ConsumableID">詳細資料</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        $('#ReCreateForm').load(`/PostConsumables/Create`, function () {
+            // 手動啟用表單驗證
+            $.validator.unobtrusive.parse($('#ReCreateForm'));
+
+            $('#uploadPhoto').change(function () {
+                let file = this.files[0];
+                let reader = new FileReader();
+
+                reader.onload = event => {
+                    $('#photoPreview').html(`<img src="${event.target.result}" class="img-fluid" />`);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    </script>
+}

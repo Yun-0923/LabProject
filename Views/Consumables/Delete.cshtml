@@ -1,0 +1,83 @@
+﻿@model LabProject.Models.Consumables
+
+@{
+    ViewData["Title"] = Model.ConsumableName;
+    Layout = "_Layout";
+}
+
+<h3 class="alert alert-danger text-center text-danger"><strong>確定要刪除 @Html.DisplayFor(model => model.ConsumableName) 所有資料嗎?</strong></h3>
+<div class="card">
+    <div class="card-body">
+        <h4>@Html.DisplayFor(model => model.ConsumableName)</h4>
+        <hr />
+        <div class="row">
+            <div class="col-md-8">
+                <dl class="row">
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.UnitInStock)
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.UnitInStock)
+                    </dd>
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.SafetyLevel)
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.SafetyLevel)
+                    </dd>
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.QuantityPerUnit)
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.QuantityPerUnit)
+                    </dd>
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.ExpireDate)
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.ExpireDate)
+                    </dd>
+                    <dt class="col-sm-4">
+                        存放位置
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.Room)
+                        @Html.DisplayFor(model => model.Cabinet)
+                        @Html.DisplayFor(model => model.Shelf)
+                    </dd>
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.Description)
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.Description)
+                    </dd>
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.Supplier)
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.Supplier.CompanyName)
+                    </dd>
+                </dl>
+            </div>
+            <div class="col-md-4">
+                @if(Model.Photo != null){
+                <img src="@Url.Action("GetImage", new { cid = Model.ConsumableID })" class="img-fluid img-thumbnail" alt="...">
+                }
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="ConsumableID" />
+            <input type="submit" value="確定刪除" class="btn btn-danger" onclick="return confirm('請注意!!您將會刪除該耗材所有資料，且無法回復。確定要刪除嗎?')" />
+        </form>
+    </div>
+</div>
+
+<div class="mt-3">
+    @await Component.InvokeAsync("VCConsumableRecord", new { CSid = Model.ConsumableID })
+</div>
+<div class="text-end mt-3">
+    <a asp-action="Index">返回耗材管理首頁</a>
+</div>
+

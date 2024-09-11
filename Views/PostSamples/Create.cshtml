@@ -1,0 +1,106 @@
+﻿@model LabProject.Models.Samples
+
+@{
+    ViewData["Title"] = "新增樣本資料";
+    Layout = null;
+}
+
+<form asp-action="Create" id="reSampleForm">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="row">
+        <div class="col-md-12 g-0">
+            <!-- 第一個卡片 -->
+            <div class="card">
+                <div class="card-header bg-success text-white text-center fs-5 fw-bold">
+                    基本資料
+                </div>
+                <div class="card-body text-primary fw-bold">
+                    <div class="form-group">
+                        <label asp-for="TypeID" class="control-label"></label>
+                        <select asp-for="TypeID" class="form-control" asp-items="ViewBag.SampleTypeList"></select>
+                        <span asp-validation-for="TypeID" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="SampleName" class="control-label"></label>
+                        <input asp-for="SampleName" class="form-control" />
+                        <span asp-validation-for="SampleName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Species" class="control-label"></label>
+                        <input asp-for="Species" class="form-control" />
+                        <span asp-validation-for="Species" class="text-danger"></span>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label asp-for="Genotype" class="control-label"></label>
+                                <input asp-for="Genotype" class="form-control" />
+                                <span asp-validation-for="Genotype" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label asp-for="Serotype" class="control-label"></label>
+                                <input asp-for="Serotype" class="form-control" />
+                                <span asp-validation-for="Serotype" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Quantity" class="control-label"></label>
+                        <input asp-for="Quantity" class="form-control" />
+                        <span asp-validation-for="Quantity" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 g-1">
+            <!-- 第二個卡片 -->
+            <div class="card">
+                <div class="card-header bg-success text-white text-center fs-5 fw-bold">
+                    存放位置
+                </div>
+                <div class="card-body text-primary fw-bold">
+                    <div class="row">
+                        <div class="form-group col-md">
+                            <label asp-for="Refrigerator" class="control-label"></label>
+                            <input asp-for="Refrigerator" class="form-control" />
+                            <span asp-validation-for="Refrigerator" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md">
+                            <label asp-for="Level" class="control-label"></label>
+                            <input asp-for="Level" class="form-control" />
+                            <span asp-validation-for="Level" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md">
+                            <label asp-for="Shelf" class="control-label"></label>
+                            <input asp-for="Shelf" class="form-control" />
+                            <span asp-validation-for="Shelf" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md">
+                            <label asp-for="Box" class="control-label"></label>
+                            <input asp-for="Box" class="form-control" />
+                            <span asp-validation-for="Box" class="text-danger"></span>
+                        </div>
+                        </div>
+                        <div class="form-group col-md">
+                            <label asp-for="BoxName" class="control-label"></label>
+                            <input asp-for="BoxName" class="form-control" />
+                            <span asp-validation-for="BoxName" class="text-danger"></span>
+                        </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="form-group">
+        <input type="submit" value="確定新增" class="btn btn-warning mt-3" />
+    </div>
+
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

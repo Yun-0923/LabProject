@@ -1,0 +1,133 @@
+﻿@model IEnumerable<LabProject.Models.Employee>
+
+@{
+    ViewData["Title"] = "會員資料管理";
+    Layout = "_Layout";
+}
+
+<h1>@ViewData["Title"]</h1>
+<table class="table table-striped table-hover border border-1 border-dark">
+    <thead class="table-primary text-center border border-1 border-dark fw-bold">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.EmployeeID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Role)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsActive)
+            </th>
+            <th>變更</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody class="text-center">
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EmployeeID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @switch (item.Role)
+                    {
+                        case 3:
+                            <span>研究人員</span>
+                            break;
+                        case 2:
+                            <span>助理</span>
+                            break;
+                        case 1:
+                            <span>主持人</span>
+                            break;
+                        case 0:
+                            <span>管理員</span>
+                            break;
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedDate)
+                </td>
+                <td>
+                    <span>@(item.IsActive ? "啟用" : "停用")</span>
+                </td>
+                <td>
+                    <button data-bs-toggle="modal" data-bs-target="#editReForm" data-edit-id="@item.EmployeeID" class="btn btn-outline-warning fw-bold"><i class="bi bi-pencil-fill"></i></button>
+                </td>
+
+                <td>
+                    <form asp-action="Delete" asp-route-id="@item.EmployeeID">
+                        <input type="hidden" value="@item.EmployeeID" />
+                        <input type="submit" value="刪除" class="btn btn-danger" onclick="return confirm('請注意!!刪除後無法回復。確定要刪除【@(item.EmployeeID)-@(item.Name)】的資料嗎?')" />
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="editReForm" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="EditReForm">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" onclick="ReEditForm()">確定變更</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        const editReForm = new bootstrap.Modal(document.getElementById('editReForm'))
+
+        $('#editReForm').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // 觸發 modal 的按鈕
+            var id = button.data('edit-id'); // 從按鈕的 data-order-id 中獲取值
+            //console.log(id);
+            $('#EditReForm').load(`/Employees/Edit?id=${id}`, function () {
+                $.validator.unobtrusive.parse($('#EditReForm'));
+            });
+        });
+
+        function ReEditForm() {
+            var id = $('#reEditForm input[name="EmployeeID"]').val(); // 獲取ID
+
+            $.ajax({
+                type: "Post",
+                url: `/Employees/Edit/${id}`,
+                data: $('#reEditForm').serialize(),
+                success: (data) => {
+                    editReForm.hide(); //把modal關閉
+                    window.location.reload();  // 重新整理頁面
+                }
+            });
+        }
+
+
+
+    </script>
+}

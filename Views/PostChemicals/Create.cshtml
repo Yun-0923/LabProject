@@ -1,0 +1,115 @@
+﻿@model LabProject.Models.Chemicals
+
+@{
+    ViewData["Title"] = "新增化學品資料";
+    Layout = null;
+}
+
+<div class="row">
+    <div class="col-md">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="card">
+                <div class="card-header bg-success text-white text-center fs-5 fw-bold">
+                    @ViewData["Title"]
+                </div>
+                <div class="card-body text-primary fw-bold">
+                    <div class="form-group">
+                        <label asp-for="Categories.CategoryName" class="control-label"></label>
+                        <select asp-for="CategoryID" class="form-control" asp-items="ViewBag.CategoryID"></select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="SupplierID" class="control-label"></label>
+                        <select asp-for="SupplierID" class="form-control" asp-items="ViewBag.SupplierID"></select>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md">
+                            <label asp-for="ChineseName" class="control-label"></label>
+                            <input asp-for="ChineseName" class="form-control" />
+                            <span asp-validation-for="ChineseName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md">
+                            <label asp-for="EnglishName" class="control-label"></label>
+                            <input asp-for="EnglishName" class="form-control" />
+                            <span asp-validation-for="EnglishName" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="CASNo" class="control-label"></label>
+                        <input asp-for="CASNo" class="form-control" />
+                        <span asp-validation-for="CASNo" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Concentration" class="control-label"></label>
+                        <input asp-for="Concentration" class="form-control" />
+                        <span asp-validation-for="Concentration" class="text-danger"></span>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md">
+                            <label asp-for="Stock" class="control-label"></label>
+                            <input asp-for="Stock" class="form-control" />
+                            <span asp-validation-for="Stock" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md">
+                            <label asp-for="SafetyLevel" class="control-label"></label>
+                            <input asp-for="SafetyLevel" class="form-control" />
+                            <span asp-validation-for="SafetyLevel" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="control-label">
+                            @Html.DisplayNameFor(model => model.Unit)
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" asp-for="Unit" id="kilogram" value="true" class="form-check-input" />
+                            <label class="form-check-label text-dark" for="kilogram">公斤</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" asp-for="Unit" id="liter" value="false" class="form-check-input" />
+                            <label class="form-check-label text-dark" for="liter">公升</label>
+                        </div>
+                        <span asp-validation-for="Unit" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-8">
+                            <label asp-for="CabinetName" class="control-label"></label>
+                            <input asp-for="CabinetName" class="form-control" />
+                            <span asp-validation-for="CabinetName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="CabinetNumber" class="control-label"></label>
+                            <input asp-for="CabinetNumber" class="form-control" />
+                            <span asp-validation-for="CabinetNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label">
+                            @Html.DisplayNameFor(model => model.StorageCondition)
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" asp-for="StorageCondition" id="roomtemp" value="true" class="form-check-input" />
+                            <label class="form-check-label text-dark" for="roomtemp">室溫</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" asp-for="StorageCondition" id="coldtemp" value="false" class="form-check-input" />
+                            <label class="form-check-label text-dark" for="coldtemp">冷藏</label>
+                        </div>
+                        <span asp-validation-for="StorageCondition" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="確定新增" class="btn btn-warning mt-3" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,148 @@
+﻿@model LabProject.Models.Consumables
+@using Newtonsoft.Json
+@{
+    var Manager = Context.Session.GetString("Manager");
+    var currentPath = Context.Request.Path;
+    var userRoleSession = Context.Session.GetString("UserRole");
+    var userRole = userRoleSession != null ? JsonConvert.DeserializeObject<int>(userRoleSession) : (int?)null;
+    if (Manager == null && currentPath != "/Home/Index")
+    {
+        Context.Response.Redirect("/Home/Index");
+        return;
+    }
+    ViewData["Title"] = Model.ConsumableName;
+}
+
+<div class="bg-blue-light">
+    <div class="container">
+        <div class="row">
+            <div class="card col-md-3 mt-3">
+                @if (Model.Photo != null)
+                {
+                <img src="@Url.Action("GetImage","Consumables", new { cid = Model.ConsumableID })" class="card-img-top w-100 mt-2" alt="@Model.ConsumableName">
+                }
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.ConsumableName)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.ConsumableName)
+                        </dd>
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.Supplier)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.Supplier.CompanyName)
+                        </dd>
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.UnitInStock) 
+                        </dt>
+                        <dd class="col-sm-8" id="currentQuantity">
+                            @Html.DisplayFor(model => model.UnitInStock)  
+                        </dd>
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.SafetyLevel)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.SafetyLevel)  (@Html.DisplayFor(model => model.QuantityPerUnit))
+                        </dd>
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.ExpireDate)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.ExpireDate)
+                        </dd>
+                        <dt class="col-sm-4">
+                            存放位置
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.Room) @Html.DisplayFor(model => model.Cabinet)  @Html.DisplayFor(model => model.Shelf)
+                        </dd>
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.Description)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.Description)
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="col-md-9" id="ConsumableList">
+                @await Component.InvokeAsync("VCConsumableRecord", new { CSid = Model.ConsumableID })
+            </div>
+        </div>
+
+        <div>
+            @if (userRole != 1)
+            {
+            <button class="btn btn-success mt-3" data-bs-toggle="modal" data-bs-target="#ConsumableReBackdrop"> 新增使用紀錄 </button>
+            }
+        </div>
+        <div class="text-end fs-5 fw-bold">
+            <a asp-action="Index">回耗材資料主畫面</a>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="ConsumableReBackdrop" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-darkblue2 text-white">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">@Model.ConsumableName </h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body bg-light" id="ConsumableReForm">
+                    <div class="text-danger" id="errorMessage"></div>
+                </div>
+                <div class="modal-footer  bg-darkblue2">
+                    <button type="button" class="btn btn-light text-success fw-bold" onclick="ReCreateConsumable()">確定新增</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        $('#ConsumableReForm').load(`/PostConsumableRecords/Create?CSId=@(Model.ConsumableID)`, function () {
+            $.validator.unobtrusive.parse($('#ConsumableReForm'));
+        });
+
+        const ConsumableReBackdrop = new bootstrap.Modal(document.getElementById('ConsumableReBackdrop'))
+
+        function ReCreateConsumable() {
+            if ($('#consumableReForm').valid()) {
+                $.ajax({
+                    type: "Post",
+                    url: `/PostConsumableRecords/Create`,
+                    data: $('#consumableReForm').serialize(),
+                    success: (data) => {
+                        console.log(data);
+                        if (data.quantity > @Model.UnitInStock) {
+                            $("#errorMessage").text("請注意，使用數量不得超過庫存量");
+                        } else {
+                            //清空表單
+                            $('#Quantity').val('');
+                            $('Notes').val('');
+                            // 清空錯誤訊息並隱藏
+                            $("#errorMessage").text('').hide();
+                            //關閉modal
+                            ConsumableReBackdrop.hide();
+
+                            let currentQuantity = parseInt($('#currentQuantity').text()); //先取得當前顯示的數量
+                            let newQuantity = currentQuantity - data.quantity;
+                            $('#currentQuantity').text(newQuantity); // 更新頁面上的數量顯示
+
+                            //重新載入資料
+                            $('#ConsumableList').load(`/PostConsumableRecords/GetVCConsumableRecord/@(Model.ConsumableID)`);
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+}

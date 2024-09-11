@@ -1,0 +1,93 @@
+﻿@model LabProject.ViewModels.VMorderDetail
+@using Newtonsoft.Json
+@{
+    Layout = null;
+    var Manager = Context.Session.GetString("Manager");
+    var userRoleSession = Context.Session.GetString("UserRole");
+    var userRole = JsonConvert.DeserializeObject<int>(userRoleSession);
+}
+
+@if ((Model.ChemicalOrderDetails.Count == 0) && (Model.ConsumableOrderDetails.Count == 0))
+{
+    <div class="text-center text-danger fs-1 mt-3">尚待新增訂單明細</div>
+}
+else
+{
+    <div class="card mt-3">
+        <div class="card-body">
+            <div>
+                <h4 class="text-success">訂單明細</h4>
+                @if (Model.ChemicalOrderDetails != null && Model.ChemicalOrderDetails.Count != 0)
+                {
+                    var firstChemicalOrderDetail = Model.ChemicalOrderDetails.FirstOrDefault();
+                    if (firstChemicalOrderDetail != null)
+                    {
+                        <dl class="row">
+                            <dd class="col-7"></dd>
+                            <dd class="col-2">供應商：@firstChemicalOrderDetail.Chemical.Supplier.CompanyName</dd>
+                            <dd class="col-3">聯絡電話：@firstChemicalOrderDetail.Chemical.Supplier.ContactTel</dd>
+                        </dl>
+                    }
+                }
+                else
+                {
+                    var firstConsumableOrderDetail = Model.ConsumableOrderDetails.FirstOrDefault();
+                    if (firstConsumableOrderDetail != null)
+                    {
+                        <dl class="row">
+                            <dd class="col-7"></dd>
+                            <dd class="col-2">供應商：@firstConsumableOrderDetail.Consumable.Supplier.CompanyName </dd>
+                            <dd class="col-3">聯絡電話：@firstConsumableOrderDetail.Consumable.Supplier.ContactTel</dd>
+                        </dl>
+                    }
+                }
+            </div>
+            <hr />
+            <dl class="row">
+                <dd class="col-sm-3">品名</dd>
+                <dd class="col-sm-2">單位/規格</dd>
+                <dd class="col-sm-2">數量</dd>
+            </dl>
+            <hr />
+            @foreach (var item in Model.ChemicalOrderDetails)
+            {
+                <dl class="row align-items-center">
+                    <dd class="col-sm-3">@item.Chemical.ChineseName</dd>
+                    <dd class="col-sm-2">@(item.Chemical.Unit ? "公斤" : "公升")</dd>
+
+                    <dd class="col-sm-5">@item.Quantity</dd>
+                    <dd class="col-sm-2 text-end">
+                        @if (Manager != null && userRole == 0 && item.Order.Status == false)
+                        {
+                            <form asp-action="DeleteChemicalOrderDetails">
+                                <input type="hidden" value="@item.OrderID" name="orderId" />
+                                <input type="hidden" value="@item.ChemicalID" name="chemicalId" />
+                                <input type="submit" value="刪除" class="btn btn-danger" onclick="return confirm('您確定要刪除此筆使用紀錄嗎?')" />
+                            </form>
+                        }
+                    </dd>
+                </dl>
+
+            }
+            @foreach (var item in Model.ConsumableOrderDetails)
+            {
+                <dl class="row align-items-center">
+                    <dd class="col-sm-3">@item.Consumable.ConsumableName</dd>
+                    <dd class="col-sm-2">@item.Consumable.QuantityPerUnit</dd>
+                    <dd class="col-sm-5"> @item.Quantity </dd>
+                    <dd class="col-sm-2 text-end">
+                        @if (Manager != null && userRole == 0 && item.Order.Status == false)
+                        {
+                            <form asp-action="DeleteConsumableOrderDetails" class="text-end">
+                                <input type="hidden" value="@item.OrderID" name="orderId" />
+                                <input type="hidden" value="@item.ConsumableID" name="consumableId" />
+                                <input type="submit" value="刪除" class="btn btn-danger" onclick="return confirm('您確定要刪除此筆使用紀錄嗎?')" />
+                            </form>
+                        }
+                    </dd>
+                </dl>
+            }
+            <hr />
+        </div>
+    </div>
+}

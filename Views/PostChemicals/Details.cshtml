@@ -1,0 +1,169 @@
+﻿@model LabProject.Models.Chemicals
+@using Newtonsoft.Json
+@{
+    var Manager = Context.Session.GetString("Manager");
+    var currentPath = Context.Request.Path;
+    var userRoleSession = Context.Session.GetString("UserRole");
+    var userRole = userRoleSession != null ? JsonConvert.DeserializeObject<int>(userRoleSession) : (int?)null;
+    if (Manager == null && currentPath != "/Home/Index")
+    {
+        Context.Response.Redirect("/Home/Index");
+        return;
+    }
+    ViewData["Title"] = Model.ChineseName;
+}
+<div class="bg-blue-light">
+    <div class="container">
+        <div class="row">
+            <div class="card col-md-3 mt-3">
+                <div class="card-header text-center bg-blue mt-2 fw-bold text-success fs-5 border">
+                    <div>@Html.DisplayFor(model => model.ChineseName)</div>
+                    <div>@Html.DisplayFor(model => model.EnglishName)</div>
+                </div>
+                <div class="card-body border mb-3">
+                    <div class="text-danger pb-2">
+                        @if (Model.Stock < Model.SafetyLevel)
+                        {
+                            <span><i class="bi bi-exclamation-triangle-fill"></i>庫存低於安全量</span>
+                        }
+                    </div>
+                    <dl class="row">
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.Categories.CategoryName)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.Categories.CategoryName)
+                        </dd>
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.Supplier)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.Supplier.CompanyName)
+                        </dd>
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.CASNo)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.CASNo)
+                        </dd>
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.Concentration)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.Concentration)
+                        </dd>
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.Stock)
+                        </dt>
+                        <dd class="col-sm-8" id="currentQuantity">
+                            @Html.DisplayFor(model => model.Stock)
+                        </dd>
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.SafetyLevel)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.SafetyLevel)
+                            <span>
+                                @(Model.Unit ? "公斤" : "公升")
+                            </span>
+                        </dd>
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.StorageCondition)
+                        </dt>
+                        <dd class="col-sm-8">
+                            <span>
+                                @(Model.StorageCondition ? "室溫" : "冷藏")
+                            </span>
+                        </dd>
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.CabinetName)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.CabinetName)
+                        </dd>
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.CabinetNumber)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.CabinetNumber)
+                        </dd>
+
+                    </dl>
+                </div>
+            </div>
+
+            <div class="col-md-9" id="ChemicalList">
+                @await Component.InvokeAsync("VCChemicalRecord", new { Cid = Model.ChemicalID })
+            </div>
+        </div>
+        <div>
+            @if (userRole != 1)
+            {
+                <button class="btn btn-success mt-3" data-bs-toggle="modal" data-bs-target="#ChemicalReBackdrop"> 新增使用紀錄 </button>
+            }
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="ChemicalReBackdrop" data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-darkblue2 text-white">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">@Model.ChineseName / @Model.EnglishName</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body bg-light" id="ChemicalReForm">
+                    </div>
+                    <div class="modal-footer bg-darkblue2">
+                        <button type="button" class="btn btn-light text-success fw-bold" onclick="ReCreateChemical()">確定新增</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-end fs-5 fw-bold">
+            <a asp-action="Index" asp-route-catid="@Model.Categories.CategoryID">回化學品主畫面</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        $('#ChemicalReForm').load(`/PostChemicals/PostChemicalRecord?CId=@(Model.ChemicalID)`, function () {
+            $.validator.unobtrusive.parse($('#ChemicalReForm'));
+        });
+
+        const ChemicalReBackdrop = new bootstrap.Modal(document.getElementById('ChemicalReBackdrop'))
+
+        function ReCreateChemical() {
+            if ($('#reChemicalForm').valid()) {
+                $.ajax({
+                    type: "Post",
+                    url: `/PostChemicals/PostChemicalRecord`,
+                    data: $('#reChemicalForm').serialize(),
+                    success: (data) => {
+                        console.log(data);
+                        if (data.quantity > @Model.Stock) {
+                            $("#errorMes").text("請注意，使用數量不得超過庫存量");
+                        } else {
+                            //清空表單
+                            $('#Quantity').val('');
+                            $('Notes').val('');
+                            $("#errorMes").text('').hide();
+                            //關閉modal
+                            ChemicalReBackdrop.hide();
+
+                            let currentQuantity = parseFloat($('#currentQuantity').text()); //先取得當前顯示的數量
+                            let newQuantity = (currentQuantity - data.quantity).toFixed(1);
+                            $('#currentQuantity').text(newQuantity); // 更新頁面上的數量顯示
+
+                            //重新載入資料
+                            $('#ChemicalList').load(`/PostChemicals/GetVCChemicalRecord/@(Model.ChemicalID)`);
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+}
