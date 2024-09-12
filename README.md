@@ -1,4 +1,4 @@
-# 實驗室管理系統
+# 實驗室管理系統 
 (Asp.net Core MVC、C#、Bootstrap、Ajax)
 
 - 快速查看耗材、化學品及樣本的位置和數量。
